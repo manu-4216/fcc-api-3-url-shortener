@@ -11,5 +11,5 @@ Objective: Build a full stack JavaScript app that is functionally similar to thi
 
  3. When I visit that shortened URL, it will redirect me to my original link.
 
- * Pro Tip: Checkout this [wiki article](https://github.com/FreeCodeCamp/FreeCodeCamp/wiki/Using-MongoDB-And-Deploying-To-Heroku) for tips on integrating MongoDB on Heroku. *
+ **Pro Tip:** Checkout this [wiki article](https://github.com/FreeCodeCamp/FreeCodeCamp/wiki/Using-MongoDB-And-Deploying-To-Heroku) for tips on integrating MongoDB on Heroku.
  
