@@ -1,7 +1,7 @@
-/**************************************************************
- * Utilities for managing the DB (connect, close, update, find)
- *    db schema: (_id, originalUrl, shortUrlPrefix)
- **************************************************************/
+/**************************************************************************
+ * Low level utilities for managing the DB (connect, close, update, find)
+ *    db schema: (_id, originalUrl, shortUrlSuffix)
+ **************************************************************************/
 
 var DButils = function () {
     var mongo = require('mongodb').MongoClient
@@ -20,6 +20,7 @@ var DButils = function () {
             */
             mongo.connect(DB_URL, function (err, db) {
                 if (err) {
+                    console.log('- rejected connect')
                     reject(err)
                 } else {
                     // Store DB and Collection
@@ -29,17 +30,17 @@ var DButils = function () {
                 }
             })
         })
-    } // end connect
+    }
     
     var close = function () {
         myDB.close()
     }
     
     var update = function (item) {
-        myCollection.update(
-                { originalUrl: item.originalUrl }, 
+        return myCollection.update(
+                { originalUrl: item.originalUrl }, // query by originalUrl, to make sure it's unique
                 item, 
-                { upsert: true },
+                { upsert: true }, // creates a new entry if does not exist
                 function (err) {
                     if (err) throw err
                 
@@ -47,15 +48,37 @@ var DButils = function () {
                     // myDB = null
             })
     }
+    
     var find = function (item) {
-        return myCollection.find(item).toArray();
+        return new Promise((resolve, reject) => {
+            myCollection.find(item).toArray()
+                .then(result => {
+                    myDB.close()
+                    resolve(result)
+                })
+                .catch(err => reject(err))
+        })
     }
+    
+    var count = function () {
+        // Use custom promise, to be able to close the DB here, before resolving the native count() promise
+        return new Promise((resolve, reject) => {
+            myCollection.find().count()
+                .then(count => {
+                    myDB.close()
+                    resolve(count)
+                })
+                .catch(err => reject(err))
+        })
+    }
+    
     
     return {
         connect: connect,
         close: close,
         update: update,
-        find: find
+        find: find,
+        count: count
     }
 }()
 
