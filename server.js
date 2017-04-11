@@ -1,10 +1,23 @@
 var express = require('express')
 var path = require('path')
-var DButils = require('./db/DButils')
+var DB = require('./db/DB')
+var utils = require('./db/utils')
 
 var app = express()
-app.set('port', process.env.PORT || 5000)
+app.set('port', process.env.PORT || 3000)
 app.use(express.static(__dirname + '/public'))
+
+
+DB.connect()
+    .then(db => {
+        app.listen(app.get('port'), function () {
+            console.log('The app is listening on port ' + app.get('port'))
+    })
+    .catch(err => {
+        console.log('ahh')
+        throw err
+    })
+})
 
 
 /**********************************************************
@@ -22,12 +35,12 @@ app.get('/new/*', function (req, res) {
     
     if (isValidUrl(originalUrl)) {
         // Get the shortUrlSuffix: 1) if already in the db, from the db; 2) if new, db.count() + 1
-        getShortUrlSuffix(originalUrl)
+        utils.getShortUrlSuffix(originalUrl)
             .then(shortUrlSuffix => {
                 console.log('shortUrlSuffix', shortUrlSuffix)
                 newShortUrlSuffix = shortUrlSuffix.toString()
                 // Save to db:
-                saveUrl({
+                utils.saveUrl({
                     originalUrl, 
                     shortUrlSuffix: newShortUrlSuffix
                 })
@@ -39,8 +52,8 @@ app.get('/new/*', function (req, res) {
                 })
             })
             .catch(err => {
-                // throw err
                 res.json({ error: 'Error while trying to create/read record \'' + originalUrl + '\'. Error: ' + err })
+                throw err
             })
     } else {
         res.json({ error: originalUrl + ' is not valid. Use http(s)/www.abc.xyz format' })
@@ -49,36 +62,43 @@ app.get('/new/*', function (req, res) {
 
 app.get('/all', function (req, res) {
     console.log('ROUTE: /all')
-    getUrl({})
+    utils.getUrl({})
         .then(list => {
             res.json(list)
         })
         .catch(err => {
+            res.send(err)
             throw err
         })
 })
 
 app.get('/count', function (req, res) {
-    console.log('ROUTE: COUNT')
-    DButils.connect()
-        .then(db => {
-            return DButils.count()
-        })
+    console.log('ROUTE: /count')
+    //DB.connect()
+        //.then(db => {
+            /*return */
+        DB.count()
+        //})
         .then(result => {
             res.json({ count: result })
         })
         .catch(err => {
+            res.send(err)
             throw err
         })
 })
 
+app.get('/delete/:id', function(req, res) {
+    console.log('ROUTE: delete/:id')
+    res.send('Work in progresss')
+})
 
 app.get('/:id', function (req, res) {
-    console.log('ROUTE: :ID')
+    console.log('ROUTE: /:ID')
     var id =  req.params.id
     var originalUrl
     
-    getUrl({ shortUrlSuffix : id })
+    utils.getUrl({ shortUrlSuffix : id })
         .then(result => {
             if (result.length > 0) {
                 originalUrl = result[0].originalUrl
@@ -89,16 +109,13 @@ app.get('/:id', function (req, res) {
             }
         })
         .catch(err => {
+            res.send(err)
             throw err
         })
 })
 
 
 //*********************************************************
-app.listen(app.get('port'), function () {
-  console.log('The app is listening on port ' + app.get('port'))
-})
-
 
 /**
  * Simplified version of the check of the url pattern
@@ -111,60 +128,4 @@ function isValidUrl (url) {
     return url.match(validWebsiteRegexp)
 }
 
-// returns Promise
-function getShortUrlSuffix (originalUrl) {
-    console.log('GET URL SUFFIX')
-    return new Promise((resolve, reject) => {
-        DButils.connect()
-        .then(db => {
-            // Get the stored originalUrl, if it exists
-            return getUrl({ originalUrl })
-        })
-        .then(results => {
-            if (results.length > 0) {
-                console.log("found, length = ", results.length)
-                resolve(results[0].shortUrlSuffix)
-            } else {
-                console.log('no result')
-                // If no result, the item will be added at the end, so get db.count()
-                DButils.count()
-                    .then(count => {
-                        console.log('count', count)
-                        resolve(parseInt(count) + 1)
-                    })
-            }
-        })
-        .catch(err => {
-            console.log('rejected getShortUrlSuffix', err)
-            reject(err)
-        })
-    })
-}
 
-
-/**
- * Take an item, and put it in the DB
- */
-function saveUrl (item) {
-    console.log('SAVE URL')
-    return DButils.connect()
-        .then(db => {
-            DButils.update(item)
-        })
-}
-
-/**
- * Use the short url, and extract the original url
- */
-function getUrl (query) {
-    console.log('GET URL')
-    return new Promise((resolve, reject) => {
-        DButils.connect()
-        .then(db => {
-            resolve(DButils.find(query))
-        })
-        .catch(err => {
-            reject(err)
-        })
-    })
-}
