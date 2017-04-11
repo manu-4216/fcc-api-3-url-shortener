@@ -8,8 +8,7 @@ var DB = function () {
     var DB_NAME = 'urlshort'
     var COLLECTION_NAME = 'urls'
     //var DB_URL = 'mongodb://' + process.env.IP + ':27017/' + DB_NAME  // local db
-    //var DB_URL = require('../private/privateData').dbUrl  // mLab db
-    var DB_URL = process.env.dbUrl
+    var DB_URL = process.env.DB_URL
     var myDB
     var myCollection
     
