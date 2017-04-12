@@ -8,7 +8,7 @@ var DB = function () {
     var DB_NAME = 'urlshort'
     var COLLECTION_NAME = 'urls'
     var DB_URL_LOCAL = 'mongodb://' + process.env.IP + ':27017/' + DB_NAME
-    var DB_URL = process.env.DB_URL || DB_URL_LOCAL
+    var DB_URL = process.env.DB_URL || DB_URL_LOCAL  // process.env.DB_URL is used to store the private url to mLab db
     var myDB
     var myCollection
     
@@ -57,35 +57,15 @@ var DB = function () {
                 { upsert: true }, // creates a new entry if does not exist
                 function (err) {
                     if (err) throw err
-                
-                    //myDB.close()
-                    // myDB = null
             })
     }
     
     var find = function (item) {
-        return new Promise((resolve, reject) => {
-            myCollection.find(item).toArray()
-                .then(result => {
-                    console.log('DB: finding')
-                    /////close()
-                    resolve(result)
-                })
-                .catch(err => reject(err))
-        })
+        return myCollection.find(item).toArray()
     }
     
     var count = function () {
-        // Use custom promise, to be able to close the DB here, before resolving the native count() promise
-        return new Promise((resolve, reject) => {
-            myCollection.find().count()
-                .then(count => {
-                    console.log('DB: counting')
-                    /////close()
-                    resolve(count)
-                })
-                .catch(err => reject(err))
-        })
+        return myCollection.find().count()
     }
     
     

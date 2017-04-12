@@ -2,15 +2,20 @@
   "name": "url-shortener",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "db-start": "mongod --port 27017 --dbpath=./data --nojournal"
+    "db-start": "mongod --port 27017 --dbpath=./data --nojournal",
+    "start-dev": "node_modules/.bin/nodemon server.js",
+    "start": "node server.js" 
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "express": "^4.15.2",
     "mongodb": "^2.2.25"
+  },
+  "devDependencies": {
+    "nodemon": "^1.11.0"
   }
 }

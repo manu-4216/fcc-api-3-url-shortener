@@ -7,10 +7,9 @@ var app = express()
 app.set('port', process.env.PORT || 3000)
 app.use(express.static(__dirname + '/public'))
 
-
 DB.connect()
+    // Only connect once the db connection has been established 
     .then(db => {
-        console.log('FILE: SERVER: Connected')
         app.listen(app.get('port'), function () {
             console.log('The app is listening on port ' + app.get('port'))
     })

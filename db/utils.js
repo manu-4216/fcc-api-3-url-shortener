@@ -1,6 +1,7 @@
 var utils = function () {
     var DB = require('../db/DB')
     
+    
     /**
      * Gets the short URL prefix: 
      *   if new URL, generate it: count + 1. If existing in the DB, return it
