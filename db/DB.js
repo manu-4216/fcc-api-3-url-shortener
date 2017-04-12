@@ -7,8 +7,8 @@ var DB = function () {
     var mongo = require('mongodb').MongoClient
     var DB_NAME = 'urlshort'
     var COLLECTION_NAME = 'urls'
-    //var DB_URL = 'mongodb://' + process.env.IP + ':27017/' + DB_NAME  // local db
-    var DB_URL = process.env.DB_URL
+    var DB_URL_LOCAL = 'mongodb://' + process.env.IP + ':27017/' + DB_NAME
+    var DB_URL = process.env.DB_URL || DB_URL_LOCAL
     var myDB
     var myCollection
     
