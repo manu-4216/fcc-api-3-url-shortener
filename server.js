@@ -14,7 +14,6 @@ DB.connect()
             console.log('The app is listening on port ' + app.get('port'))
     })
     .catch(err => {
-        console.log('FILE: SERVER: Connection failed')
         throw err
     })
 })
@@ -28,7 +27,6 @@ app.get('/', function (req, res) {
 })
 
 app.get('/new/*', function (req, res) {
-    console.log('ROUTE: new/...')
     var originalUrl = req.url.slice(5) // remove the first 5 caracters ('/new/') from the url
     var shortUrlBase = req.protocol + '://' + req.get('host')
     var newShortUrlSuffix
@@ -37,7 +35,6 @@ app.get('/new/*', function (req, res) {
         // Get the shortUrlSuffix: 1) if already in the db, from the db; 2) if new, db.count() + 1
         utils.getShortUrlSuffix(originalUrl)
             .then(shortUrlSuffix => {
-                console.log('shortUrlSuffix', shortUrlSuffix)
                 newShortUrlSuffix = shortUrlSuffix.toString()
                 // Save to db:
                 utils.saveUrl({
@@ -61,7 +58,6 @@ app.get('/new/*', function (req, res) {
 })
 
 app.get('/all', function (req, res) {
-    console.log('ROUTE: /all')
     utils.getUrl({})
         .then(list => {
             res.json(list)
@@ -73,12 +69,7 @@ app.get('/all', function (req, res) {
 })
 
 app.get('/count', function (req, res) {
-    console.log('ROUTE: /count')
-    //DB.connect()
-        //.then(db => {
-            /*return */
         DB.count()
-        //})
         .then(result => {
             res.json({ count: result })
         })
@@ -88,13 +79,8 @@ app.get('/count', function (req, res) {
         })
 })
 
-app.get('/delete/:id', function(req, res) {
-    console.log('ROUTE: delete/:id')
-    res.send('Work in progresss')
-})
 
 app.get('/:id', function (req, res) {
-    console.log('ROUTE: /:ID')
     var id =  req.params.id
     var originalUrl
     
@@ -102,7 +88,6 @@ app.get('/:id', function (req, res) {
         .then(result => {
             if (result.length > 0) {
                 originalUrl = result[0].originalUrl
-                //res.send(originalUrl)
                 res.redirect(originalUrl)
             } else {
                 res.json({ error: id + ' does not correspond to any stored originalUrl'})

@@ -12,13 +12,11 @@ var DB = function () {
     var myDB
     var myCollection
     
-    console.log('dburl', DB_URL)
     
     var connect = function () {
         return new Promise((resolve, reject) => {
             //Reuse an open db connection.
             if (myDB) {
-                console.log('DB already open. Return the old one.')
                 resolve(myDB)
             }
             
@@ -30,11 +28,9 @@ var DB = function () {
 
             mongo.connect(DB_URL, options,  function (err, db) {
                 if (err) {
-                    console.log('- rejected connect')
                     reject(err)
                 } else {
                     // Store DB and Collection
-                    console.log('- resolved connect')
                     myDB = db
                     myCollection = db.collection(COLLECTION_NAME)
                     resolve(db)
@@ -44,7 +40,6 @@ var DB = function () {
     }
     
     var close = function () {
-        console.log('DB: closing')
         if (myDB) {
             myDB.close()
         }
