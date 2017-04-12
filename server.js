@@ -10,11 +10,12 @@ app.use(express.static(__dirname + '/public'))
 
 DB.connect()
     .then(db => {
+        console.log('FILE: SERVER: Connected')
         app.listen(app.get('port'), function () {
             console.log('The app is listening on port ' + app.get('port'))
     })
     .catch(err => {
-        console.log('ahh')
+        console.log('FILE: SERVER: Connection failed')
         throw err
     })
 })
@@ -56,7 +57,7 @@ app.get('/new/*', function (req, res) {
                 throw err
             })
     } else {
-        res.json({ error: originalUrl + ' is not valid. Use http(s)/www.abc.xyz format' })
+        res.json({ error: originalUrl + ' is not valid. Use http(s)://www.abc.xyz format' })
     }
 })
 

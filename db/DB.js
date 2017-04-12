@@ -22,24 +22,6 @@ var DB = function () {
                 resolve(myDB)
             }
             
-            /*
-            var options = {
-                keepAlive: 1,
-                connectTimeoutMS: 30000
-            }
-            */
-            
-            /*
-            var options = {
-                server: {
-                    auto_reconnect:true, poolSize: 200,
-                    socketOptions: {
-                        connectTimeoutMS: 1000
-                    }
-                }
-            }
-            */
-            
             var options = {
                 keepAlive: 1,
                 connectTimeoutMS: 30000
@@ -52,6 +34,7 @@ var DB = function () {
                     reject(err)
                 } else {
                     // Store DB and Collection
+                    console.log('- resolved connect')
                     myDB = db
                     myCollection = db.collection(COLLECTION_NAME)
                     resolve(db)
